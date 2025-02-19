@@ -6,11 +6,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, r2_score
 
 # Title
-st.title("EPL Player Finishing Ability Predictor")
+st.title("Number of Goals Predictor")
 
 # Sidebar Inputs
 st.sidebar.header("User Input Features")
-matches_played = st.sidebar.slider("Matches Played", 0, 38, 19)
+matches_played = st.sidebar.slider("Matches Played", 10, 38, 19)
 goals_scored = st.sidebar.slider("Goals Scored", 0, 30, 10)
 
 # Sample Data (You can replace this with real EPL data)
