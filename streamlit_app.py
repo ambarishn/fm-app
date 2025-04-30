@@ -1,40 +1,52 @@
 import streamlit as st
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
-st.title("⚽ Shots vs. Goals Predictor")
-st.write("Use simple linear regression to predict average goals per game based on shots per game.")
+# Sample data
+subject_lines = [
+    "Congratulations, you won a free lottery ticket!",
+    "Meeting agenda for tomorrow",
+    "Get cheap meds now",
+    "Your invoice is attached",
+    "Win big money!!!",
+    "Let's catch up next week",
+    "Exclusive deal just for you",
+    "Project deadline reminder",
+    "Claim your free reward today",
+    "Lunch at 1?"
+]
+labels = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0]  # 1 = spam, 0 = not spam
 
-# Sample data: Shots per game vs Goals per game
-X = np.array([[2], [4], [6], [8], [10]])  # Shots per game
-y = np.array([0.5, 1.0, 1.5, 2.0, 2.5])  # Goals per game
+# Train model
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(subject_lines)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.3, random_state=42)
 
-# Train the model
-model = LinearRegression()
-model.fit(X, y)
+model = MultinomialNB()
+model.fit(X_train, y_train)
 
-# User input
-shots = st.slider("Shots per Game", min_value=0, max_value=15, value=5)
-predicted_goals = model.predict([[shots]])[0]
+# App title
+st.title("📧 Spam Subject Line Filter")
 
-# Show prediction
-st.subheader("Prediction")
-st.write(f"🧐 Expected Goals per Game: **{predicted_goals:.2f}**")
+# Input from user
+user_input = st.text_input("Enter an email subject line:")
 
-# Show regression details
-st.subheader("Model Equation")
-slope = model.coef_[0]
-intercept = model.intercept_
-st.latex(r"y = {:.2f} \cdot x + {:.2f}".format(slope, intercept))
+if user_input:
+    # Predict
+    user_vector = vectorizer.transform([user_input])
+    prediction = model.predict(user_vector)[0]
+    prediction_proba = model.predict_proba(user_vector)[0]
 
-# Plotting
-fig, ax = plt.subplots()
-ax.scatter(X, y, color='green', label='Actual data')
-ax.plot(X, model.predict(X), color='orange', label='Regression line')
-ax.scatter(shots, predicted_goals, color='red', label='Your prediction', zorder=5)
-ax.set_xlabel("Shots per Game")
-ax.set_ylabel("Goals per Game")
-ax.set_title("Linear Regression: Shots vs Goals")
-ax.legend()
-st.pyplot(fig)
+    # Show result
+    if prediction == 1:
+        st.error(f"🔴 Prediction: Spam (Confidence: {prediction_proba[1]*100:.2f}%)")
+    else:
+        st.success(f"🟢 Prediction: Not Spam (Confidence: {prediction_proba[0]*100:.2f}%)")
+
+# Show model accuracy
+if st.checkbox("Show model accuracy on test data"):
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    st.write(f"✅ Model Accuracy: **{accuracy*100:.2f}%** on test data")
