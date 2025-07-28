@@ -1,0 +1,20 @@
+{
+  "Customer A": {
+    "utilization_ERP": 68,
+    "utilization_HCM": 24,
+    "utilization_SCM": 64,
+    "critical_srs": 1,
+    "css_leads": 0,
+    "expansion_products": [],
+    "referenceable": "Yes",
+    "referenceable_expiry": "2026-07-26"
+  },
+  "Customer B": {
+    "utilization_HCM": 50,
+    "critical_srs": 0,
+    "css_leads": 0,
+    "expansion_products": [],
+    "referenceable": "Yes",
+    "referenceable_expiry": "2026-07-26"
+  }
+}
